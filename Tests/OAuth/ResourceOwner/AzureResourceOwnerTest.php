@@ -41,13 +41,13 @@ json;
     ];
 
     protected $expectedUrls = [
-        'authorization_url_csrf' => 'http://user.auth/?test=2&response_type=code&client_id=clientid&state=random&redirect_uri=http%3A%2F%2Fredirect.to%2F&resource=https%3A%2F%2Fgraph.windows.net',
+        'authorization_url_csrf' => 'http://user.auth/?test=2&response_type=code&client_id=clientid&scope=user.read&state=random&redirect_uri=http%3A%2F%2Fredirect.to%2F',
     ];
 
     public function testGetAuthorizationUrl()
     {
         $this->assertEquals(
-            $this->options['authorization_url'].'&response_type=code&client_id=clientid&state=random&redirect_uri=http%3A%2F%2Fredirect.to%2F&resource=https%3A%2F%2Fgraph.windows.net',
+            $this->options['authorization_url'].'&response_type=code&client_id=clientid&scope=user.read&state=random&redirect_uri=http%3A%2F%2Fredirect.to%2F',
             $this->resourceOwner->getAuthorizationUrl('http://redirect.to/')
         );
     }
@@ -81,14 +81,14 @@ json;
          * @var \HWI\Bundle\OAuthBundle\OAuth\Response\AbstractUserResponse
          */
         $userResponse = $resourceOwner->getUserInformation([
-            'access_token' => 'token',
-            'id_token' => $token,
+              'token_type' => 'Bearer',
+              'access_token' => $token,
         ]);
 
         $this->assertInstanceOf($class, $userResponse);
         $this->assertEquals('foo666', $userResponse->getUsername());
         $this->assertEquals('foo', $userResponse->getNickname());
-        $this->assertEquals('token', $userResponse->getAccessToken());
+        $this->assertEquals($token, $userResponse->getAccessToken());
         $this->assertNull($userResponse->getRefreshToken());
         $this->assertNull($userResponse->getExpiresIn());
     }
@@ -104,7 +104,7 @@ json;
         $token = '.'.base64_encode($this->userResponse);
 
         try {
-            $this->resourceOwner->getUserInformation(['access_token' => 'token', 'id_token' => $token]);
+            $this->resourceOwner->getUserInformation(['access_token' => 'token', 'access_token' => $token]);
             $this->fail('An exception should have been raised');
         } catch (HttpTransportException $e) {
             $this->assertSame($exception, $e->getPrevious());
@@ -118,7 +118,7 @@ json;
             $httpUtils,
             array_merge(
                 [
-                    'resource' => 'https://graph.windows.net',
+                    'scope' => 'user.read',
                 ],
                 $options
             )
