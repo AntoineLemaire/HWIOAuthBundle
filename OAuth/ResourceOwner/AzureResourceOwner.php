@@ -50,7 +50,7 @@ class AzureResourceOwner extends GenericOAuth2ResourceOwner
     public function getUserInformation(array $accessToken, array $extraParameters = [])
     {
         // from http://stackoverflow.com/a/28748285/624544
-        list(, $jwt) = explode('.', $accessToken['id_token'], 3);
+        list(, $jwt) = explode('.', $accessToken['access_token'], 3);
 
         // if the token was urlencoded, do some fixes to ensure that it is valid base64 encoded
         $jwt = str_replace(['-', '_'], ['+', '/'], $jwt);
@@ -87,7 +87,7 @@ class AzureResourceOwner extends GenericOAuth2ResourceOwner
             'authorization_url' => 'https://login.microsoftonline.com/%s/oauth2/v2.0/authorize',
             'access_token_url' => 'https://login.microsoftonline.com/%s/oauth2/v2.0/token',
             'application' => 'common',
-            'api_version' => 'v1.0',
+            'api_version' => 'v2.0',
             'csrf' => true,
         ]);
     }

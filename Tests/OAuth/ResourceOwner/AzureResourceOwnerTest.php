@@ -82,8 +82,8 @@ json;
          * @var \HWI\Bundle\OAuthBundle\OAuth\Response\AbstractUserResponse
          */
         $userResponse = $resourceOwner->getUserInformation([
-            'access_token' => 'token',
-            'id_token' => $token,
+              'token_type' => 'Bearer',
+              'access_token' => $token,
         ]);
 
         $this->assertInstanceOf($class, $userResponse);
@@ -107,7 +107,7 @@ json;
         $token = '.'.base64_encode($this->userResponse);
 
         try {
-            $this->resourceOwner->getUserInformation(['access_token' => 'token', 'id_token' => $token]);
+            $this->resourceOwner->getUserInformation(['access_token' => 'token', 'access_token' => $token]);
             $this->fail('An exception should have been raised');
         } catch (HttpTransportException $e) {
             $this->assertSame($exception, $e->getPrevious());
